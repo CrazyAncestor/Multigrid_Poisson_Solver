@@ -119,67 +119,87 @@ void Evolve_KDK( matrix &dens, particle *pars, const double dt )
 
 
 
+
+
 //--------------------------------------------------------------------------------
 // Function    : Evolve_DKD
 // Description : 
-// Note        :
+// Note        : uncommend first when start to calculate orbit(156-158,190-192)
 // Input       : 
 // Output      : 
 //--------------------------------------------------------------------------------
-void Evolve_DKD( matrix &dens, particle *pars, const double dt )
+void Evolve_DKD(matrix& dens, particle* pars, const double dt)
 {
-    double **force;
-    force = new double *[N_DIMS];
-    for ( int d = 0; d < N_DIMS; d++ )    force[d] = new double [N_CELLS];
-    
-    double *pos = new double[N_DIMS];
-    double *vel = new double[N_DIMS];
-    double *acc = new double[N_DIMS];
-    
+    double** force;
+    force = new double* [N_DIMS];
+    for (int d = 0; d < N_DIMS; d++)    force[d] = new double[N_CELLS];
+
+    double* pos = new double[N_DIMS];
+    double* vel = new double[N_DIMS];
+    double* acc = new double[N_DIMS];
+    double r;
+    double relativity_factor;
+    int alpha;
     const double dx = BOX_DX;
-    
+
+    alpha = 0.0008;
+
     // 1. kick
-    for ( int p = 0; p < N_PARS; p++ )
+    for (int p = 0; p < N_PARS; p++)
     {
-        pars[p].Par_GetPos( pos );
-        pars[p].Par_GetVel( vel );
+        pars[p].Par_GetPos(pos);
+        pars[p].Par_GetVel(vel);
         //printf("P = %d, px = %.5e ,py = %.5e ", p, pos[0], pos[1]);
-        for ( int d = 0; d < N_DIMS; d++ )    pos[d] += vel[d] * 0.5 * dt;
+        for (int d = 0; d < N_DIMS; d++)
+        {
+            //open it only when calculating orbit
+            /*r = pow((pos[d] * pos[d] + pos[d + 1] * pos[d + 1]), 0.5);
+            relativity_factor = 1 + alpha / (pow(r, 2));
+            vel[d] -= (4 * PI * PI * pos[d] * 0.5 * dt) * relativity_factor / (pow(r, 3));*/
+            pos[d] += vel[d] * 0.5 * dt;
+        }
         //printf("=> px = %.5e ,py = %.5e ", pos[0], pos[1]);
-        pars[p].Par_SetPos( pos );
+        pars[p].Par_SetPos(pos);
     } // for ( int p = 0; p < N_PARS; p++ )
     //printf("\n");
 
 
     // 2. drift
-    matrix pot( BOX_N, dx );
+    matrix pot(BOX_N, dx);
     pot.init_potential();
-    matrix solved_pot = Solver_Potential( pot, dens );
-    Solver_Force( solved_pot, force );
-    
-    for ( int p = 0; p < N_PARS; p++ )
+    matrix solved_pot = Solver_Potential(pot, dens);
+    Solver_Force(solved_pot, force);
+
+    for (int p = 0; p < N_PARS; p++)
     {
-        pars[p].Par_SumAcc( acc, force ); // get the velocity
-        pars[p].Par_GetVel( vel );
-        for ( int d = 0; d < N_DIMS; d++ )    vel[d] += acc[d] * dt;
-        pars[p].Par_SetVel( vel );
+        pars[p].Par_SumAcc(acc, force); // get the velocity
+        pars[p].Par_GetVel(vel);
+        for (int d = 0; d < N_DIMS; d++)    vel[d] += acc[d] * dt;
+        pars[p].Par_SetVel(vel);
     } // for ( int p = 0; p < N_PARS; p++ )
 
 
     // 3. kick
-    for ( int p = 0; p < N_PARS; p++ )
+    for (int p = 0; p < N_PARS; p++)
     {
-        pars[p].Par_GetPos( pos );
-        pars[p].Par_GetVel( vel );
-        for ( int d = 0; d < N_DIMS; d++ )    pos[d] += vel[d] * 0.5 * dt;
-        pars[p].Par_SetPos( pos );
+        pars[p].Par_GetPos(pos);
+        pars[p].Par_GetVel(vel);
+        for (int d = 0; d < N_DIMS; d++)    
+        {
+            //open it only when calculating orbit
+            /*r = pow((pos[d] * pos[d] + pos[d + 1] * pos[d + 1]), 0.5);
+            relativity_factor = 1 + alpha / (pow(r, 2));
+            vel[d] -= (4 * PI * PI * pos[d] * 0.5 * dt) * relativity_factor / (pow(r, 3));*/
+            pos[d] += vel[d] * 0.5 * dt;
+        }
+        pars[p].Par_SetPos(pos);
     } // for ( int p = 0; p < N_PARS; p++ )
 
 
     delete[] vel;
     delete[] acc;
-    
-    for ( int d = 0; d < N_DIMS; d++ )    delete[] force[d];
+
+    for (int d = 0; d < N_DIMS; d++)    delete[] force[d];
     delete[] force;
 
 } // FUNCTION : Evolve_DKD

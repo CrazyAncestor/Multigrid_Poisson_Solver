@@ -41,6 +41,8 @@ matrix Solver_Potential( matrix pot, matrix dens )
 void Solver_Force( matrix pot, double **force )
 {
     const double dx = BOX_DX;
+    const double softening = 0.01;
+    double r;
     int di, dj, dk;
 
     const int did_x[3] = { 1, BOX_N, BOX_N*BOX_N };
@@ -77,7 +79,10 @@ void Solver_Force( matrix pot, double **force )
                 force[d][idx] = -( pot.get_value( idx ) - pot.get_value( idx-di-dj-dk ) ) / dx;
             } else
             {
-                force[d][idx] = -0.5 * ( pot.get_value( idx+di+dj+dk ) - pot.get_value( idx-di-dj-dk ) ) / dx;
+                r = 1 * pow((pow((i - 0.5 * BOX_N), 2) + pow((j - 0.5 * BOX_N), 2) +pow((k - 0.5 * BOX_N), 2) + pow(softening, 2)), 0.5);
+                force[d][idx] = -0.5 * (pot.get_value(idx + di + dj + dk) - pot.get_value(idx - di - dj - dk)) / dx;
+                //force[d][idx] = - 100 * pow(r, -2);
+                //force[d][idx] = - 1 * pow(r,-2);
             } // if ( i == 0 || j == 0 ) ... else if ... else ...
             
         } // for ( int idx = 0; idx < N_CELLS; idx++ )

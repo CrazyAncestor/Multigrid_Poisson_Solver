@@ -11,6 +11,6 @@ Please edit include/simulation_option.h
 
 Add new simulation:
 1. goto "include/macro.h" define a new problem number(e.g. #define PROB_TEST)
-2. goto "initialize.cpp" add a new initialize funciton for your problem.
+2. goto "initialize.cpp" and "initialize.h" add a new initialize funciton for your problem.
 3. goto "include/initialize.h" add the prototype for your function.
 4. goto "include/simulation_option.h" define PROB_NUM to be your PROB_TEST
