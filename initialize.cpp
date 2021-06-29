@@ -179,19 +179,20 @@ bool Init_NBody( matrix &mat, particle *pars )
         double v = constructor_Models.set_vel(r)/pow(4*PI,0.5);
         
         //random direction
-        double theta1 = constructor_Models.randomReal(0,PI);
+        double cos_theta1 = constructor_Models.randomReal(-1,1);
         double phi1   = constructor_Models.randomReal(0,2*PI);
-
-        double theta2 = constructor_Models.randomReal(0,PI);
+        double sin_theta1 = (1-cos_theta1*cos_theta,0.5);
+        double cos_theta2 = constructor_Models.randomReal(-1,1);
         double phi2   = constructor_Models.randomReal(0,2*PI);
+        double sin_theta2 = (1-cos_theta2*cos_theta,0.5);
 
-        pos[0] = r*sin(theta1)*cos(phi1)+BOX_L/2.0;
-        pos[1] = r*sin(theta1)*sin(phi1)+BOX_L/2.0;
-        pos[2] = r*cos(theta1)+BOX_L/2.0;
+        pos[0] = r*sin_theta1*cos(phi1)+BOX_L/2.0;
+        pos[1] = r*sin_theta1*sin(phi1)+BOX_L/2.0;
+        pos[2] = r*cos_theta1+BOX_L/2.0;
 
-        vel[0] = v*sin(theta2)*cos(phi2);
-        vel[1] = v*sin(theta2)*sin(phi2);
-        vel[2] = v*cos(theta2);
+        vel[0] = v*sin_theta2*cos(phi2);
+        vel[1] = v*sin_theta2*sin(phi2);
+        vel[2] = v*cos_theta2;
         #endif 
 
         pars[p].Par_SetMass( par_m );
